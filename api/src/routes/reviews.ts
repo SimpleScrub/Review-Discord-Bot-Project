@@ -32,7 +32,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 // GET /api/reviews/:id
 router.get('/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   if (isNaN(id)) {
     res.status(400).json({ error: 'Invalid ID' });
     return;
@@ -54,6 +54,38 @@ router.get('/categories/list', async (_req: Request, res: Response) => {
     distinct: ['category'],
   });
   res.json(categories.map((c) => c.category));
+});
+
+// POST /api/reviews
+router.post('/', async (req: Request, res: Response) => {
+  const { subject, category, rating, comments, imageUrl, authorId, guildId } = req.body as {
+    subject?: string;
+    category?: string;
+    rating?: string;
+    comments?: string;
+    imageUrl?: string;
+    authorId?: string;
+    guildId?: string;
+  };
+
+  if (!subject?.trim() || !category?.trim() || !rating?.trim() || !authorId?.trim()) {
+    res.status(400).json({ error: 'Missing required fields' });
+    return;
+  }
+
+  const review = await prisma.review.create({
+    data: {
+      subject: subject.trim(),
+      category: category.trim(),
+      rating: rating.trim(),
+      comments: comments?.trim() || null,
+      imageUrl: imageUrl?.trim() || null,
+      authorId: authorId.trim(),
+      guildId: guildId?.trim() || '0',
+    },
+  });
+
+  res.status(201).json(review);
 });
 
 export default router;

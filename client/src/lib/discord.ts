@@ -6,6 +6,7 @@ export type AuthUser = {
   id: string;
   username: string;
   avatar: string | null;
+  guildId: string | null | undefined;
 };
 
 function isInsideDiscord(): boolean {
@@ -41,5 +42,6 @@ export async function initDiscord(): Promise<AuthUser | null> {
     id: auth.user.id,
     username: auth.user.username,
     avatar: auth.user.avatar,
+    guildId: discordSdk.guildId,
   };
 }

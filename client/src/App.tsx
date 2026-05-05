@@ -2,6 +2,7 @@ import { useState, useDeferredValue, useEffect } from 'react';
 import FilterBar from './components/FilterBar';
 import ReviewCard from './components/ReviewCard';
 import ReviewModal from './components/ReviewModal';
+import CreateReviewModal from './components/CreateReviewModal';
 import { useReviews, type Review } from './hooks/useReviews';
 import { initDiscord, type AuthUser } from './lib/discord';
 
@@ -10,18 +11,18 @@ export default function App() {
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Review | null>(null);
+  const [creating, setCreating] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     initDiscord()
-      .then((u) => { setUser(u); setAuthReady(true); })
-      .catch(() => setAuthReady(true));
+      .then((u) => setUser(u))
+      .catch(() => {});
   }, []);
 
   const deferredSearch = useDeferredValue(search);
 
-  const { data, loading, error } = useReviews({
+  const { data, loading, error, refetch } = useReviews({
     category,
     search: deferredSearch,
     page,
@@ -51,6 +52,12 @@ export default function App() {
           {data && (
             <span className="text-xs text-[#949ba4]">{data.total} review{data.total !== 1 ? 's' : ''}</span>
           )}
+          <button
+            onClick={() => setCreating(true)}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#5865f2] hover:bg-[#4752c4] text-white transition-colors"
+          >
+            + Write Review
+          </button>
           {user && (
             <img
               src={user.avatar
@@ -121,6 +128,14 @@ export default function App() {
 
       {selected && (
         <ReviewModal review={selected} onClose={() => setSelected(null)} />
+      )}
+
+      {creating && (
+        <CreateReviewModal
+          user={user}
+          onClose={() => setCreating(false)}
+          onCreated={() => { refetch(); setCreating(false); }}
+        />
       )}
     </div>
   );
