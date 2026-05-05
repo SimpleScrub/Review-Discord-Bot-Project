@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  subject   String
+  content   String
+  rating    Int
+  authorId  String
+  guildId   String
+  createdAt DateTime @default(now())
+}
