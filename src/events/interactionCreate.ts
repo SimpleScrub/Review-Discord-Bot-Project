@@ -12,7 +12,7 @@ module.exports = {
     try {
       await command.execute(interaction);
     } catch (error) {
-      console.error(error);
+      console.error('Command error in', interaction.commandName, ':', error);
       const msg = { content: 'Error executing command.', ephemeral: true };
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp(msg);

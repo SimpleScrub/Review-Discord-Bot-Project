@@ -4,13 +4,16 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Review {
   id        Int      @id @default(autoincrement())
   subject   String
-  content   String
-  rating    Int
+  category  String
+  rating    String
+  imageUrl  String?
+  comments  String?
   authorId  String
   guildId   String
   createdAt DateTime @default(now())
